@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -79,5 +80,120 @@ func TestQuerySqlComplex(t *testing.T) {
 		fmt.Println("birthDate: ", birth_date)
 		fmt.Println("married: ", married)
 		fmt.Println("create_at: ", create_at)
+	}
+}
+
+func TestSqlInjection(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	username := "admin'; #"
+	password := "salah"
+
+	q := "select * from users where username = '" + username + "' and password = '" + password + "' limit 1"
+	fmt.Println(q)
+	rows, err := db.QueryContext(context.Background(), q)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var username, password string
+		err := rows.Scan(&username, &password)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Sukses Login", username)
+	} else {
+		fmt.Println("Gagal Login")
+	}
+}
+
+func TestSqlInjectionSafe(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	username := "admin"
+	password := "admin"
+
+	q := "select * from users where username = ? and password = ? limit 1"
+	fmt.Println(q)
+	rows, err := db.QueryContext(context.Background(), q, username, password)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var username, password string
+		err := rows.Scan(&username, &password)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Sukses Login", username)
+	} else {
+		fmt.Println("Gagal Login")
+	}
+}
+
+func TestExecSqlParam(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	username := "danu"
+	password := "danu"
+
+	q := "insert into users(username, password) VALUES (?, ?)"
+	_, err := db.ExecContext(context.Background(), q, username, password)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Success Insert New Users")
+}
+
+func TestAutoincrement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	email := "danu@anakdesa.id"
+	comment := "Golang"
+
+	q := "insert into comments(email, comment) VALUES (?, ?)"
+	result, err := db.ExecContext(context.Background(), q, email, comment)
+	if err != nil {
+		panic(err)
+	}
+	insertId, err := result.LastInsertId()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Success Insert New Comments with Id", insertId)
+}
+
+func TestPrepareStatement(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	q := "insert into comments(email, comment) VALUES (?, ?)"
+	stmt, err := db.PrepareContext(context.Background(), q)
+	if err != nil {
+		panic(err)
+	}
+	defer stmt.Close()
+
+	for i := 0; i < 20; i++ {
+		email := "danu" + strconv.Itoa(i) + "@anakdesa.id"
+		comment := "Komentar ke " + strconv.Itoa(i)
+		result, err := stmt.ExecContext(context.Background(), email, comment)
+		if err != nil {
+			panic(err)
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Comments with Id", id)
 	}
 }
