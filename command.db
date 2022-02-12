@@ -11,3 +11,11 @@ INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALU
 INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALUES (2, 'Budi', 'budi@anakdesa.id', 100000, 4.0, '1995-3-12', true)
 
 INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALUES (3, 'Caca', NULL, 100000, 4.0, '1995-3-12', true)
+
+create TABLE users (username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL, primary key (username)) engine InnoDB;
+
+insert into users (username, password) values('admin', 'admin');
+
+create table comments ( id INT NOT NULL AUTO_INCREMENT, email VARCHAR(100) NOT NULL, comment TEXT, PRIMARY KEY (id)) ENGINE InnoDB;
+
+
