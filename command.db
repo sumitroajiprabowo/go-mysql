@@ -1,0 +1,13 @@
+create database learn_golang;
+user lean_golang;
+
+
+CREATE TABLE CUSTOMER (id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY (id)) ENGINE = InnoDB;
+
+ALTER TABLE CUSTOMER add COLUMN email VARCHAR(100), ADD COLUMN balance INTEGER DEFAULT 0, add COLUMN rating DOUBLE DEFAULT 0.0, add COLUMN create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, add COLUMN birth_date DATE, add COLUMN married BOOLEAN DEFAULT false;
+
+INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALUES (1, 'Danu', 'danu@anakdesa.id', 100000, 5.0, '1999-9-10', true)
+
+INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALUES (2, 'Budi', 'budi@anakdesa.id', 100000, 4.0, '1995-3-12', true)
+
+INSERT INTO CUSTOMER(id, name, email, balance, rating, birth_date, married) VALUES (3, 'Caca', NULL, 100000, 4.0, '1995-3-12', true)
