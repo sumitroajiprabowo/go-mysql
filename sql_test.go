@@ -197,3 +197,38 @@ func TestPrepareStatement(t *testing.T) {
 		fmt.Println("Comments with Id", id)
 	}
 }
+
+func TestTransaction(t *testing.T) {
+	db := GetConnection()
+	defer db.Close()
+
+	tx, err := db.Begin()
+	if err != nil {
+		panic(err)
+	}
+
+	q := "insert into comments(email, comment) VALUES (?, ?)"
+
+	for i := 0; i < 10; i++ {
+		email := "danu" + strconv.Itoa(i) + "@anakdesa.id"
+		comment := "Komentar ke " + strconv.Itoa(i)
+		result, err := tx.ExecContext(context.Background(), q, email, comment)
+		if err != nil {
+			tx.Rollback()
+			panic(err)
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil {
+			tx.Rollback()
+			panic(err)
+		}
+		fmt.Println("Comments with Id", id)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		panic(err)
+	}
+
+}
