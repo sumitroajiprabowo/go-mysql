@@ -1,4 +1,4 @@
-module github.com/sumitroajiprabowo/go-mysql
+module gomysql
 
 go 1.17
 
